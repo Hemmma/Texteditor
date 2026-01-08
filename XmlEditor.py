@@ -1,9 +1,11 @@
 """
 Lab2新增: XML编辑器模块
 使用组合模式(Composite Pattern)表示XML树形结构
+Lab3更新: 使用适配器模式统一树形结构显示
 """
 import re
 import WorkSpace
+from TreeView import XmlTreeAdapter, TreeRenderer
 
 
 class XmlElement:
@@ -59,21 +61,7 @@ class XmlElement:
                 lines.append(f"{indent_str}<{self.tag}{attrs_str}></{self.tag}>")
         return lines
     
-    def to_tree_lines(self, prefix="", is_last=True):
-        lines = []
-        connector = "└── " if is_last else "├── "
-        attrs_str = ", ".join([f'{k}="{v}"' for k, v in self.attributes.items()])
-        node_str = f"{self.tag} [{attrs_str}]"
-        lines.append(prefix + connector + node_str)
-        extension = "    " if is_last else "│   "
-        new_prefix = prefix + extension
-        if self.text and self.text.strip():
-            text_connector = "└── " if not self.children else "├── "
-            lines.append(new_prefix + text_connector + f'"{self.text}"')
-        for i, child in enumerate(self.children):
-            child_is_last = (i == len(self.children) - 1)
-            lines.extend(child.to_tree_lines(new_prefix, child_is_last))
-        return lines
+
 
 
 def parse_xml(xml_string):
@@ -534,12 +522,18 @@ class XmlTreeCommand(XmlEditCommand):
         if not file.root:
             print("(空XML)")
             return False
-        lines = file.root.to_tree_lines(prefix="", is_last=True)
-        for line in lines:
-            if lines.index(line) == 0:
+        
+        # 使用适配器模式
+        adapter = XmlTreeAdapter(file.root)
+        lines = TreeRenderer.render(adapter, prefix="", is_last=True)
+        
+        # 第一行去掉前缀（保持原有行为）
+        for i, line in enumerate(lines):
+            if i == 0:
                 print(line[4:])
             else:
                 print(line)
+        
         return False
     
     def can_undo(self):
