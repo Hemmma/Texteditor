@@ -5,6 +5,7 @@ import Memento
 import Logging
 import Statistics  # Lab2新增
 import os  # Lab2新增
+from TreeView import DirectoryTreeAdapter, TreeRenderer  # Lab3新增
 
 class WorkSpace():
     current_workFile_path = ""
@@ -338,8 +339,9 @@ class DirTreeCommand():
         if not paths:
             print("(空)")
             return
+        
+        # 构建树形字典
         tree = {}
-
         for filePath in paths:
             parts = filePath.split("/")
             cur = tree
@@ -347,20 +349,14 @@ class DirTreeCommand():
                 if p not in cur:
                     cur[p] = {}
                 cur = cur[p]
-
-        def print_tree(node, indent=""):
-            keys = list(node.keys())
-            total = len(keys)
-            for i, key in enumerate(keys):
-                is_last = (i == total - 1)
-                prefix = "└── " if is_last else "├── "
-                print(indent + prefix + key)
-
-                # 如果还有下级目录，继续打印
-                next_indent = indent + ("    " if is_last else "│   ")
-                print_tree(node[key], next_indent)
-
-        print_tree(tree)
+        
+        # 使用适配器模式渲染
+        root = DirectoryTreeAdapter(".", tree)
+        lines = TreeRenderer.render(root, prefix="", is_last=True)
+        
+        # 打印时跳过根节点（保持原有行为）
+        for line in lines[1:]:
+            print(line)
 
 class UndoCommand():
     def execute(self, command):

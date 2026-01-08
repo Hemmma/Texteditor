@@ -4,6 +4,7 @@ import EditorActions
 import Logging
 import XmlEditor  # Lab2新增
 import SpellChecker  # Lab2新增
+import TreeView  # Lab3新增
 
 class CommandFactory:
     def __init__(self):
