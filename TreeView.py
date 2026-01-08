@@ -72,7 +72,8 @@ class DirectoryTreeAdapter(TreeNode):
     def get_children(self) -> list:
         """将 children_dict 转换为 DirectoryTreeAdapter 列表"""
         children = []
-        for name, sub_dict in self.children_dict.items():
+        # 排序以确保一致的显示顺序
+        for name, sub_dict in sorted(self.children_dict.items()):
             children.append(DirectoryTreeAdapter(name, sub_dict))
         return children
 

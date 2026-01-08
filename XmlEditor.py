@@ -500,6 +500,9 @@ class DeleteElementCommand(XmlEditCommand):
 
 class XmlTreeCommand(XmlEditCommand):
     """xml-tree命令"""
+    # 树形连接符的长度（"└── "）
+    TREE_PREFIX_LENGTH = 4
+    
     def execute(self, command):
         args = command.split()
         if len(args) == 1:
@@ -530,7 +533,7 @@ class XmlTreeCommand(XmlEditCommand):
         # 第一行去掉前缀（保持原有行为）
         for i, line in enumerate(lines):
             if i == 0:
-                print(line[4:])
+                print(line[self.TREE_PREFIX_LENGTH:])
             else:
                 print(line)
         
